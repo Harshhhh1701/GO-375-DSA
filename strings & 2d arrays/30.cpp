@@ -1,6 +1,6 @@
 //{ Driver Code Starts
 // Initial Template for C++
-
+//Given a matrix of ‘O’ and ‘X’, replace ‘O’ with ‘X’ if surrounded by ‘X’
 #include <bits/stdc++.h>
 using namespace std;
 
