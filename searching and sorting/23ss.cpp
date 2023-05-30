@@ -7,7 +7,7 @@ using namespace std;
 
 // } Driver Code Ends
 //User function template in C++
-
+//minimum number of pages 
 class Solution 
 {
     public:
