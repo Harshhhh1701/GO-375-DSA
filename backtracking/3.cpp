@@ -1,89 +1,242 @@
-//{ Driver Code Starts
-//Initial template for C++
+/*
+PROBLEM:
 
-#include <bits/stdc++.h>
+CodingNinjas has provided a crossword of 10*10 grid. The grid contains '+' or '-' as its cell values. Now, you are also provided with a word list that needs to placed accurately in the grid. Cells marked with '-' are to be filled with word list.
+For example, The following is an example for the input crossword grid and the word list.
++-++++++++
++-++-+++++
++-------++
++-++-+++++
++-++-+++++
++-++-+++++
+++++-+++++
+++++-+++++
+++++++++++
+----------
+CALIFORNIA;NIGERIA;CANADA;TELAVIV
+Output for the given input should be:
++C++++++++
++A++T+++++
++NIGERIA++
++A++L+++++
++D++A+++++
++A++V+++++
+++++I+++++
+++++V+++++
+++++++++++
+CALIFORNIA
+Note: We have provided such test cases that there is only one solution for the given input.
+Input format:
+The first 10 lines of input contain crossword. Each of 10 lines has a character array of size 10. Input characters are either '+' or '-'.
+The next line of input contains the word list, in which each word is separated by ';'. 
+Output format:
+Print the crossword grid, after placing the words of word list in '-' cells.  
+Sample Test Cases:
+Sample Input 1:
++-++++++++
++-++-+++++
++-------++
++-++-+++++
++-++-+++++
++-++-+++++
+++++-+++++
+++++-+++++
+++++++++++
+----------
+CALIFORNIA;NIGERIA;CANADA;TELAVIV
+Sample Output 1:
++C++++++++
++A++T+++++
++NIGERIA++
++A++L+++++
++D++A+++++
++A++V+++++
+++++I+++++
+++++V+++++
+++++++++++
+CALIFORNIA
+
+
+
+
+
+
+
+CODE:
+*/
+
+
+#include<iostream>
 using namespace std;
-
-
-// } Driver Code Ends
-//User function template for C++
-
-class Solution {
-  public:
-    void findNumbers(vector<int>& ar, int sum,
-                 vector<vector<int> >& res, vector<int>& r,
-                 int i)
-{
-    // if we get exact answer
-    if (sum == 0) {
-        res.push_back(r);
-        return;
-    }
+char crossWord[10][10];
  
-    // Recur for all remaining elements that
-    // have value smaller than sum.
-    while (i < ar.size() && sum - ar[i] >= 0) {
+bool isValidHorizontal(int row, int col, string word){
  
-        // Till every element in the array starting
-        // from i which can contribute to the sum
-        r.push_back(ar[i]); // add them to list
+	if(10 - col < word.length())
+		return false;
  
-        // recursive call for next numbers
-        findNumbers(ar, sum - ar[i], res, r, i);
-        i++;
+	for (int i = 0, j = col; i < word.length(); ++i,j++)
+	{
+		if (crossWord[row][j] != '-' && crossWord[row][j] != word[i]){
+			return false;
+		}
+	}
  
-        // Remove number from list (backtracking)
-        r.pop_back();
-    }
+	return true;
 }
  
-    //Function to return a list of indexes denoting the required 
-    //combinations whose sum is equal to given number.
-    vector<vector<int> > combinationSum(vector<int> &ar, int sum) {
-        // Your code here
-        sort(ar.begin(), ar.end());
+bool isValidVertical(int row, int col, string word){
  
-        // remove duplicates
-        ar.erase(unique(ar.begin(), ar.end()), ar.end());
-     
-        vector<int> r;
-        vector<vector<int> > res;
-        findNumbers(ar, sum, res, r, 0);
-     
-        return res;
-    }
-};
-
-//{ Driver Code Starts.
+	if(10 - row < word.length())
+		return false;
+ 
+	for (int i = row, j = 0; j < word.length(); ++i,j++)
+	{
+		if (crossWord[i][col] != '-' && crossWord[i][col] != word[j]){
+			return false;
+		}
+	}
+ 
+	return true;
+}
+ 
+void setHorizontal(int row, int col, string word, bool state[]){
+ 
+	for (int i = 0, j = col; i < word.size(); ++i, j++)
+	{
+		if (crossWord[row][j] != '+'){
+ 
+			if(crossWord[row][j] == word[i])
+				state[i] = false;
+			else
+				state[i] = true;
+			crossWord[row][j] = word[i];
+		}
+ 
+	}
+}
+ 
+void setVertical(int row, int col, string word, bool state[]){
+ 
+	for (int i = 0, j = row; i < word.size(); ++i, j++)
+	{
+		if (crossWord[j][col] != '+'){
+ 
+			if(crossWord[j][col] == word[i])
+				state[i] = false;
+			else
+				state[i] = true;
+			crossWord[j][col] = word[i];
+		}
+ 
+	}
+}
+ 
+void resetHorizontal(int row, int col, bool state[], int size){
+ 
+	for (int i = 0, j = col; i < size; ++i,j++)
+	{
+		if(state[i] == true)
+			crossWord[row][j] = '-';
+	}
+	return;
+}
+ 
+void resetVertical(int row, int col, bool state[], int size){
+ 
+	for (int i = 0, j = row; i < size; ++i,j++)
+	{
+		if(state[i] == true)
+			crossWord[j][col] = '-';
+	}
+	return;
+}
+ 
+void set_value(bool helper[],int len ){
+	for(int i=0;i<len;i++){
+		helper[i] = false;
+	}
+}
+ 
+ 
+bool crossWordHelper(string input[], int size, int index){
+ 
+	if(index == size){
+		for(int i =0; i<10; i++){
+			for(int j=0; j<10; j++){
+ 
+				cout << crossWord[i][j] ;
+			}
+			cout << endl;
+		}
+		return true;
+	}
+ 
+	for(int i =0; i<10; i++){
+		for(int j=0; j<10; j++){
+ 
+			if(crossWord[i][j] == '-' || crossWord[i][j] == input[index][0]){
+				int length = input[index].size();
+				bool state[length];
+				set_value(state,length);
+ 
+				if(isValidHorizontal(i, j, input[index])){
+					setHorizontal(i, j, input[index], state);
+					if(crossWordHelper(input, size, index+1)){
+						return true;
+					}
+					resetHorizontal(i, j, state, length);
+				}
+ 
+				if(isValidVertical(i, j, input[index])){
+					setVertical(i, j, input[index], state);
+					if(crossWordHelper(input, size, index+1)){
+						return true;
+					}
+					resetVertical(i, j, state, length);
+				}
+ 
+			}
+		}
+	}
+	return false;
+}
+ 
+void solveCrossWord(string input[], int size){
+ 
+	bool res = crossWordHelper(input, size, 0);
+	return;
+}
+ 
 int main(){
-    int t;
-    cin>>t;
-    while(t--){
-        int n;
-        cin>>n;
-        vector<int> A;
-        for(int i=0;i<n;i++){
-            int x;
-            cin>>x;
-            A.push_back(x);
-        }   
-        int sum;
-        cin>>sum;
-        Solution ob;
-        vector<vector<int>> result = ob.combinationSum(A, sum);
-   		if(result.size()==0){
-   			cout<<"Empty";
-   		}
-        for(int i=0;i<result.size();i++){
-            cout<<'(';
-            for(int j=0;j<result[i].size();j++){
-                cout<<result[i][j];
-                if(j<result[i].size()-1)
-                    cout<<" ";
-            }
-            cout<<")";
-        }
-        cout<<"\n";
-    }
-}	
-// } Driver Code Ends
+	string ss;
+	for(int i = 0; i<10; i++){
+		cin >>ss;
+		for(int j = 0; j < ss.size(); j++){
+			crossWord[i][j] =  ss[j];
+		}
+	}
+ 
+	char s[200];
+	cin >> s;
+ 
+	string input[10];
+	char ch;
+	string word ="";
+	int a =0;
+	for (int i = 0; s[i] != '\0'; ++i)
+	{
+ 
+		if(s[i] == ';'){
+			input[a++] = word;
+			word ="";
+		}
+		else {
+			word += s[i];
+		}
+	}
+	input[a++] = word;
+ 
+	solveCrossWord(input, a);
+return 0;
+}
